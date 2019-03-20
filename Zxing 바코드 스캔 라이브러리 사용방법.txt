@@ -1,0 +1,98 @@
+< Zxing 바코드 스캔 라이브러리 사용방법 >
+
+# 소스 프로젝트 생성
+
+# AndroidManifest.xml 파일에 사용자 권한 추가
+    <uses-permission android:name="android.permission.CAMERA" />
+
+# 아래 폴더를 /res 폴더로 복사
+ - values-hdpi
+ - values-xhdpi
+ - values-xxhdpi
+
+#zxing jar 파일 추가 
+ 1. libs폴더에 core-2.2.jar 파일 복사 
+ 2. Project Properties->JavaBuild Path->Libraries->AddJARs
+ 3. Project의 libs폴더에 있는 jar파일 선택
+ 4. Apply 버튼 누르고, Ok 버튼 클릭.
+
+# /src/me 폴더를 복사
+ - ViewFinderView.java 파일을 열고 아래 패키지명을 변경
+   import com.example.zxingbarcodeex.*;
+
+# /src/com/example/zxingbarcodeex/ZXingScannerView.java 파일을 복사
+ - 복사 위치는 MainActivity.java 파일과 동일한 경로
+ - ZXingScannerView.java 파일을 열고 패키지명을 변경
+
+# merge_camera_preview_view_finder.xml 파일을 /res/layout 폴더에 복사
+
+# 새로운 Activity 를 생성하고 이름을 SimpleScannerActivity 으로 지정
+
+# SimpleScannerActivity 파일에 소스 코드 입력
+import com.google.zxing.*;
+import android.app.*;
+import android.content.*;
+import android.os.*;
+import android.util.*;
+
+public class SimpleScannerActivity extends Activity 
+	implements ZXingScannerView.ResultHandler {
+	
+	private ZXingScannerView mScannerView;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		//setContentView(R.layout.activity_simple_scanner);
+		mScannerView = new ZXingScannerView(this);   // Programmatically initialize the scanner view
+        setContentView(mScannerView);                // Set the scanner view as the content view
+	}
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mScannerView.setResultHandler(this); // Register ourselves as a handler for scan results.
+        mScannerView.startCamera();          // Start camera on resume
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mScannerView.stopCamera();           // Stop camera on pause
+    }
+
+    @Override
+    public void handleResult(Result rawResult) {
+    	Log.d("tag", "Scan Result - " + rawResult.getText() + " / " 
+                + rawResult.getBarcodeFormat().toString());
+    	Intent intent = new Intent();
+    	intent.putExtra("BarcodeValue", rawResult.getText());
+    	intent.putExtra("BarcodeFormat", rawResult.getBarcodeFormat().toString());
+    	setResult(Activity.RESULT_OK, intent);
+    	finish();
+    }
+}
+
+# MainActivity.java 파일 위쪽에 서브 액티비티 ID 선언
+	final static int ACT_BARCODE_SCAN = 1004;
+
+# MainActivity.java 파일에서 서브 액티비티 호출
+	Intent intent = new Intent(getApplicationContext(), SimpleScannerActivity.class);
+	startActivityForResult(intent, ACT_BARCODE_SCAN);
+
+# MainActivity.java 파일에 결과 수신 이벤트 함수 정의
+	
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case ACT_BARCODE_SCAN:
+			if (resultCode == Activity.RESULT_OK) {
+				String barcodeValue = data.getStringExtra("BarcodeValue");
+				String barcodeFormat = data.getStringExtra("BarcodeFormat");
+				mTextResult.setText(barcodeValue + " / " + barcodeFormat);
+			}
+			break;
+		}
+	}
+
+
+

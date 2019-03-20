@@ -3,6 +3,7 @@
 [Android & Java] Barcode scan example using Zxing library
 
 [Image1 : Show Barcode value & format]
+
 [Image1 : Barcode scanning screen]
 
 <div>

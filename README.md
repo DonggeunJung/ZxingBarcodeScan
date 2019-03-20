@@ -4,7 +4,7 @@
 
 [Image1 : Show Barcode value & format]
 
-[Image1 : Barcode scanning screen]
+[Image2 : Barcode scanning screen]
 
 <div>
 <img src="https://github.com/DonggeunJung/ZxingBarcodeScan/blob/master/ZxingBarcodeScan_Capture01.jpg?raw=true width="400px"></img>
